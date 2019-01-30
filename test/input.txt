@@ -76,19 +76,33 @@
   delete 0
   delete 3
 
+  # should not delete if confirmation is not given
+  delete 2
+  n
+  list
+
+  # should detect invalid entry
+  delete 1
+  invalid entry
+  n
+
   # should catch attempt to delete something already deleted
   delete 2
+  y
   delete 2
+  y
 
   # should have deleted based on last active view's index
   list
 
   # deletes correct person
   delete 4
+  y
   list
 
   # listing indexes get updated on next request
   delete 1
+  y
   list
 
 ##########################################################
