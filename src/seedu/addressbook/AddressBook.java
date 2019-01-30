@@ -71,6 +71,9 @@ public class AddressBook {
     private static final String MESSAGE_COMMAND_HELP_PARAMETERS = "\tParameters: %1$s";
     private static final String MESSAGE_COMMAND_HELP_EXAMPLE = "\tExample: %1$s";
     private static final String MESSAGE_DELETE_PERSON_SUCCESS = "Deleted Person: %1$s";
+    private static final String MESSAGE_DELETE_PERSON_CANCELLED = "Deletion Cancelled";
+    private static final String MESSAGE_DELETE_PERSON_CONFIRMATION = "About to delete: %1$s";
+    private static final String MESSAGE_DELETE_PERSON_CONFIRMATION_CHOICES = "Please enter y to confirm or n to cancel";
     private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s";
     private static final String MESSAGE_DISPLAY_LIST_ELEMENT_INDEX = "%1$d. ";
     private static final String MESSAGE_GOODBYE = "Exiting Address Book... Good bye!";
@@ -508,8 +511,30 @@ public class AddressBook {
             return MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
         }
         final String[] targetInModel = getPersonByLastVisibleIndex(targetVisibleIndex);
+        if(!isDeleteConfirmed(targetInModel)){
+            return MESSAGE_DELETE_PERSON_CANCELLED;
+        }
         return deletePersonFromAddressBook(targetInModel) ? getMessageForSuccessfulDelete(targetInModel) // success
                                                           : MESSAGE_PERSON_NOT_IN_ADDRESSBOOK; // not found
+    }
+
+    /**
+     * Confirm user's intention to delete person before execution.
+     *
+     * @param deletedPerson the person about to be deleted
+     * @return true if confirmed, false if cancelled
+     */
+    private static boolean isDeleteConfirmed(String[] deletedPerson){
+        while(true) {
+            showToUser(getMessageForDeleteConfirmation(deletedPerson), MESSAGE_DELETE_PERSON_CONFIRMATION_CHOICES);
+            String userCommand = getUserInput();
+            echoUserCommand(userCommand);
+            if (userCommand.trim().equals("y")) {
+                return true;
+            } else if (userCommand.trim().equals("n")) {
+                return false;
+            }
+        }
     }
 
     /**
@@ -557,6 +582,18 @@ public class AddressBook {
     private static String getMessageForSuccessfulDelete(String[] deletedPerson) {
         return String.format(MESSAGE_DELETE_PERSON_SUCCESS, getMessageForFormattedPersonData(deletedPerson));
     }
+
+    /**
+     * Constructs a confirmation message before delete command execution.
+     *
+     * @see #isDeleteConfirmed(String[])
+     * @param deletedPerson person about to be deleted
+     * @return confirmation message
+     */
+    private static String getMessageForDeleteConfirmation(String[] deletedPerson) {
+        return String.format(MESSAGE_DELETE_PERSON_CONFIRMATION, getMessageForFormattedPersonData(deletedPerson));
+    }
+
 
     /**
      * Clears all persons in the address book.
